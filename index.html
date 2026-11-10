@@ -1,0 +1,149 @@
+<!-- Fullscreen Base64 Decoder Overlay by GK -->
+<div id="fullscreen-code-overlay" style="display: none;">
+    <div class="overlay-content">
+        <div class="info-text">⚠️ Kode ini hanya akan aktif selama 2 hari</div>
+        <div class="code-container">
+            <span class="widget-label">KODE ANDA:</span>
+            <span id="decoded-number" class="widget-value">Memuat...</span>
+        </div>
+        <button id="copy-code-btn" onclick="copyDecodedCode()">Salin Kode</button>
+    </div>
+</div>
+
+<style>
+    /* Membuat background hitam pekat (black screen) dan full screen */
+    #fullscreen-code-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000000;
+        z-index: 9999999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    .overlay-content {
+        background-color: #121212;
+        padding: 40px 50px;
+        border-radius: 16px;
+        border: 1px solid #333;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 230, 118, 0.15);
+        max-width: 90%;
+    }
+
+    .info-text {
+        color: #ff5252;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        letter-spacing: 0.5px;
+    }
+
+    .code-container {
+        margin-bottom: 35px;
+    }
+
+    .widget-label {
+        font-size: 14px;
+        color: #888;
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+
+    .widget-value {
+        font-size: 56px;
+        font-weight: 900;
+        color: #00e676;
+        letter-spacing: 4px;
+        display: block;
+    }
+
+    #copy-code-btn {
+        background-color: #00e676;
+        color: #000000;
+        border: none;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.2s ease;
+    }
+
+    #copy-code-btn:hover {
+        background-color: #00c853;
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // ==========================================
+        // PENGATURAN TEKS PEMISAH (SILAKAN UBAH)
+        // ==========================================
+        const teksPemisah = "xtzx="; 
+        
+        let urlSekarang = window.location.href;
+        let base64String = "";
+
+        // Mengecek apakah URL mengandung teks pemisah
+        if (urlSekarang.includes(teksPemisah)) {
+            // Memotong URL berdasarkan teks pemisah dan mengambil bagian setelahnya
+            let setelahPemisah = urlSekarang.split(teksPemisah)[1];
+            
+            // Membersihkan jika ada karakter lain setelah kode (seperti & atau #)
+            base64String = setelahPemisah.split('&')[0].split('#')[0];
+        }
+
+        // Jika berhasil mendapatkan string setelah pemisah, lakukan decode
+        if (base64String) {
+            try {
+                let decodedText = atob(base64String);
+                
+                // Validasi: Apakah hasil decode berupa angka dan tidak kosong?
+                if (decodedText && !isNaN(decodedText) && decodedText.trim() !== "") {
+                    document.getElementById("decoded-number").innerText = decodedText;
+                    document.getElementById("fullscreen-code-overlay").style.display = "flex";
+                    document.getElementById("copy-code-btn").dataset.code = decodedText;
+                    
+                    // Kunci scroll background
+                    document.body.style.overflow = "hidden";
+                }
+            } catch (e) {
+                // Abaikan jika Base64 tidak valid
+            }
+        }
+    });
+
+    function copyDecodedCode() {
+        let btn = document.getElementById("copy-code-btn");
+        let code = btn.dataset.code;
+        
+        if (code) {
+            navigator.clipboard.writeText(code).then(() => {
+                let originalText = btn.innerText;
+                btn.innerText = "BERHASIL DISALIN!";
+                btn.style.backgroundColor = "#ffea00"; 
+                btn.style.color = "#000";
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = "#00e676";
+                }, 2000);
+            }).catch(err => {
+                alert("Gagal menyalin kode. Silakan salin manual.");
+            });
+        }
+    }
+</script>
